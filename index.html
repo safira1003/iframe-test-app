@@ -152,11 +152,29 @@
 </div>
 
 <script>
+  function safeStringify(obj) {
+    const seen = new WeakSet();
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) return "[Circular]";
+        seen.add(value);
+      }
+      if (typeof value === "bigint") return value.toString();
+      return value;
+    }, 2);
+  }
+
   function log(msg) {
     const el = document.getElementById("log");
-    el.textContent += "\n" + JSON.stringify(msg, null, 2);
+    try {
+      el.textContent += "\n" + safeStringify(msg);
+    } catch (err) {
+      el.textContent += "\n[LOG ERROR] " + err.message;
+      console.error(err);
+    }
     el.scrollTop = el.scrollHeight;
   }
+
 
   function clearLog() {
     document.getElementById("log").textContent = "";
