@@ -117,6 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
+    <p>update: 21:56</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -176,6 +177,11 @@
   </div>
 
   <script>
+    let APP_CONTEXT = {
+      appId: null,
+      mode: null,
+    };
+
     function log(msg) {
       const el = document.getElementById("log");
       el.textContent += "\n" + JSON.stringify(msg, null, 2);
@@ -189,7 +195,14 @@
     }
 
     function send(event, payload = {}) {
-      const data = { channel: "helpdesk:apps", event, payload };
+      const data = {
+        channel: "helpdesk:apps",
+        event,
+        payload: {
+          appId: APP_CONTEXT.appId,
+          ...payload,
+        },
+      };
       window.parent.postMessage(data, "*");
       log({ sent: data });
     }
@@ -234,6 +247,14 @@
 
     window.addEventListener("message", (e) => {
       if (e.data?.channel !== "helpdesk:apps") return;
+      const { event, payload } = e.data;
+
+      if (event === "helpdesk:context:app") {
+        APP_CONTEXT.appId = payload.appId;
+        APP_CONTEXT.mode = payload.mode;
+
+        log({ contextAppReceived: APP_CONTEXT });
+      }
       log({ received: e.data });
     });
 
