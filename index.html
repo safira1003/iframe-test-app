@@ -116,7 +116,7 @@
 <body>
 
   <div class="card">
-    <h2>🧪 Helpdesk Iframe Test App</h2>
+    <h2>Helpdesk Iframe Test</h2>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -158,6 +158,21 @@
     <div class="row">
       <button onclick="clearLog()" class="secondary">Clear Log</button>
     </div>
+
+    <div class="section-title">Permissions Test</div>
+
+    <div class="grid">
+      <button onclick="testClipboardRead()">Clipboard Read</button>
+      <button onclick="testClipboardWrite()">Clipboard Write</button>
+      <button onclick="testCamera()">Camera</button>
+      <button onclick="testMic()">Microphone</button>
+      <button onclick="testLocation()">Location</button>
+      <button onclick="testFullscreen()">Fullscreen</button>
+      <button onclick="testShare()">Web Share</button>
+      <button onclick="testIdle()">Idle Detection</button>
+      <button onclick="testStorage()">Storage Access</button>
+      <button onclick="testPopup()">Open Popup</button>
+    </div>
   </div>
 
   <script>
@@ -166,6 +181,8 @@
       el.textContent += "\n" + JSON.stringify(msg, null, 2);
       el.scrollTop = el.scrollHeight;
     }
+
+    log({ status: "iframe loaded", time: Date.now() });
 
     function clearLog() {
       document.getElementById("log").textContent = "";
@@ -219,6 +236,91 @@
       if (e.data?.channel !== "helpdesk:apps") return;
       log({ received: e.data });
     });
+
+    async function testClipboardRead() {
+      try {
+        const text = await navigator.clipboard.readText();
+        log({ clipboardRead: text });
+      } catch (e) {
+        log({ clipboardReadError: e.message });
+      }
+    }
+
+    async function testClipboardWrite() {
+      try {
+        await navigator.clipboard.writeText("Hello from iframe");
+        log({ clipboardWrite: "OK" });
+      } catch (e) {
+        log({ clipboardWriteError: e.message });
+      }
+    }
+
+    async function testCamera() {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        log({ camera: "granted" });
+      } catch (e) {
+        log({ cameraError: e.message });
+      }
+    }
+
+    async function testMic() {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        log({ mic: "granted" });
+      } catch (e) {
+        log({ micError: e.message });
+      }
+    }
+
+    function testLocation() {
+      navigator.geolocation.getCurrentPosition(
+        p => log({ location: p.coords }),
+        e => log({ locationError: e.message })
+      );
+    }
+
+    function testFullscreen() {
+      document.documentElement.requestFullscreen()
+        .then(() => log({ fullscreen: "ok" }))
+        .catch(e => log({ fullscreenError: e.message }));
+    }
+
+    function testShare() {
+      if (!navigator.share) return log({ share: "not supported" });
+      navigator.share({ title: "Test", text: "Hello" })
+        .then(() => log({ share: "ok" }))
+        .catch(e => log({ shareError: e.message }));
+    }
+
+    async function testIdle() {
+      if (!("IdleDetector" in window)) return log({ idle: "not supported" });
+      try {
+        const idle = new IdleDetector();
+        await idle.start({ threshold: 60_000 });
+        log({ idle: "started" });
+      } catch (e) {
+        log({ idleError: e.message });
+      }
+    }
+
+    async function testStorage() {
+      if (!document.requestStorageAccess) {
+        return log({ storage: "not supported" });
+      }
+      try {
+        await document.requestStorageAccess();
+        log({ storage: "granted" });
+      } catch (e) {
+        log({ storageError: e.message });
+      }
+    }
+
+    function testPopup() {
+      const w = window.open("https://example.com", "_blank");
+      log({ popupOpened: !!w });
+    }
+
   </script>
 
 </body>
