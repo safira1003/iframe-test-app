@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Helpdesk Iframe Test App</title>
+</head>
+
+<body>
+  <h2>Iframe Test App</h2>
+
+  <button onclick="sendReady()">Send READY</button>
+  <button onclick="getTicket()">Get Ticket</button>
+  <button onclick="getUser()">Get User</button>
+  <button onclick="resizeBig()">Resize Big</button>
+  <button onclick="resizeSmall()">Resize Small</button>
+  <button onclick="fullscreenOn()">Fullscreen ON</button>
+  <button onclick="fullscreenOff()">Fullscreen OFF</button>
+
+  <pre id="log"></pre>
+
+  <script>
+    function log(msg) {
+      document.getElementById("log").textContent +=
+        "\n" + JSON.stringify(msg, null, 2);
+    }
+
+    function send(event, payload = {}) {
+      window.parent.postMessage({
+        channel: "helpdesk:apps",
+        event,
+        payload
+      }, "*");
+    }
+
+    function sendReady() {
+      send("helpdesk:app:ready");
+    }
+
+    function getTicket() {
+      send("helpdesk:get:context:ticket");
+    }
+
+    function getUser() {
+      send("helpdesk:get:context:user");
+    }
+
+    function resizeBig() {
+      send("helpdesk:app:resize", {
+        width: "800px",
+        height: "900px"
+      });
+    }
+
+    function resizeSmall() {
+      send("helpdesk:app:resize", {
+        width: "400px",
+        height: "500px"
+      });
+    }
+
+    function fullscreenOn() {
+      send("helpdesk:app:fullscreen", {
+        fullscreen: true
+      });
+    }
+
+    function fullscreenOff() {
+      send("helpdesk:app:fullscreen", {
+        fullscreen: false
+      });
+    }
+
+    window.addEventListener("message", (e) => {
+      if (e.data?.channel !== "helpdesk:apps") return;
+      log(e.data);
+    });
+  </script>
+
+</body>
+
+</html>
