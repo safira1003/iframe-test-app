@@ -117,7 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
-    <p>update: Tuesday, February 10, 2026 8:43:24 AM GMT+07:00</p>
+    <p>update: Tuesday, February 10, 2026 8:51:50 AM GMT+07:00</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -168,6 +168,26 @@
       </label>
 
       <button onclick="testPopup()">Open Popup</button>
+    </div>
+
+    <div class="section-title">Clipboard Permision Test</div>
+    <div class="row">
+      <label>
+        Text to copy
+        <input id="clipboardInput" placeholder="Type something here" />
+      </label>
+
+      <button onclick="clipboardWrite()" class="green">
+        Copy to Clipboard
+      </button>
+    </div>
+
+    <div class="row">
+      <button onclick="clipboardRead()" class="purple">
+        Paste from Clipboard
+      </button>
+
+      <span id="clipboardResult" style="font-size:13px;color:#334155"></span>
     </div>
   </div>
 
@@ -272,7 +292,6 @@
         url = "https://example.com/";
       }
 
-      // auto-fix kalau user nulis tanpa protocol
       if (!/^https?:\/\//i.test(url)) {
         url = "https://" + url;
       }
@@ -282,6 +301,57 @@
         popupUrl: url,
         popupOpened: !!w
       });
+    }
+
+    async function clipboardWrite() {
+      const input = document.getElementById("clipboardInput");
+      const text = input.value;
+
+      if (!text) {
+        log({ clipboardWrite: "no text to copy" });
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+
+        log({
+          clipboardWrite: "success",
+          value: text,
+          time: new Date().toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour12: false
+          })
+        });
+      } catch (err) {
+        log({
+          clipboardWrite: "failed",
+          error: err.message
+        });
+      }
+    }
+
+    async function clipboardRead() {
+      try {
+        const text = await navigator.clipboard.readText();
+
+        document.getElementById("clipboardResult").textContent =
+          "Clipboard: " + text;
+
+        log({
+          clipboardRead: "success",
+          value: text,
+          time: new Date().toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour12: false
+          })
+        });
+      } catch (err) {
+        log({
+          clipboardRead: "failed",
+          error: err.message
+        });
+      }
     }
 
   </script>
