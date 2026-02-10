@@ -117,7 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
-    <p>update: Monday, February 9, 2026 10:34:45 PM GMT+07:00</p>
+    <p>update: Tuesday, February 10, 2026 8:06:01 AM GMT+07:00</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -192,7 +192,13 @@
       el.scrollTop = el.scrollHeight;
     }
 
-    log({ status: "iframe loaded", time: Date.now() });
+    log({
+      status: "iframe loaded",
+      time: new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        hour12: false
+      })
+    });
 
     function clearLog() {
       document.getElementById("log").textContent = "";
