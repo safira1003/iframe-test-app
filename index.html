@@ -117,7 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
-    <p>update: Tuesday, February 10, 2026 10:10:58 AM GMT+07:00</p>
+    <p>update: Tuesday, February 10, 2026 10:27:57 AM GMT+07:00</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -201,7 +201,6 @@
     </div> -->
 
     <div class="section-title">Web Share Permission Test</div>
-
     <div class="row">
       <label>
         Share Title
@@ -220,6 +219,26 @@
       <button onclick="webShare()" class="green">
         Open Native Share
       </button>
+    </div>
+
+    <div class="section-title">Camera Permission Test</div>
+    <div class="row">
+      <button onclick="startCamera()" class="green">
+        Start Camera
+      </button>
+
+      <button onclick="stopCamera()" class="secondary">
+        Stop Camera
+      </button>
+    </div>
+    <div class="row">
+      <video id="cameraPreview" autoplay playsinline muted style="
+      width: 100%;
+      max-width: 360px;
+      border-radius: 12px;
+      background: #000;
+    ">
+      </video>
     </div>
   </div>
 
@@ -477,6 +496,67 @@
           message: err.message
         });
       }
+    }
+
+    let cameraStream = null;
+
+    async function startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        log({
+          camera: "not supported",
+          reason: "mediaDevices.getUserMedia unavailable"
+        });
+        return;
+      }
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
+
+        const video = document.getElementById("cameraPreview");
+        video.srcObject = cameraStream;
+
+        log({
+          camera: "started",
+          tracks: cameraStream.getTracks().map(t => ({
+            kind: t.kind,
+            label: t.label,
+            enabled: t.enabled
+          })),
+          time: new Date().toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour12: false
+          })
+        });
+      } catch (err) {
+        log({
+          camera: "failed",
+          error: err.name,
+          message: err.message
+        });
+      }
+    }
+
+    function stopCamera() {
+      if (!cameraStream) {
+        log({ camera: "no active stream" });
+        return;
+      }
+
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+
+      const video = document.getElementById("cameraPreview");
+      video.srcObject = null;
+
+      log({
+        camera: "stopped",
+        time: new Date().toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          hour12: false
+        })
+      });
     }
 
   </script>
