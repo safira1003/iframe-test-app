@@ -117,7 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
-    <p>update: Tuesday, February 10, 2026 8:51:50 AM GMT+07:00</p>
+    <p>update: Tuesday, February 10, 2026 9:41:43 AM GMT+07:00</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -181,13 +181,22 @@
         Copy to Clipboard
       </button>
     </div>
-
     <div class="row">
       <button onclick="clipboardRead()" class="purple">
         Paste from Clipboard
       </button>
 
       <span id="clipboardResult" style="font-size:13px;color:#334155"></span>
+    </div>
+
+    <div class="section-title">Fullscreen Permision Test (Native API)</div>
+    <div class="grid">
+      <button onclick="iframeFullscreenOn()" class="purple">
+        Iframe Fullscreen ON
+      </button>
+      <button onclick="iframeFullscreenOff()" class="secondary">
+        Iframe Fullscreen OFF
+      </button>
     </div>
   </div>
 
@@ -349,6 +358,60 @@
       } catch (err) {
         log({
           clipboardRead: "failed",
+          error: err.message
+        });
+      }
+    }
+
+    async function iframeFullscreenOn() {
+      try {
+        const el = document.documentElement;
+
+        if (!document.fullscreenEnabled) {
+          log({
+            fullscreen: "not supported or blocked by permission policy"
+          });
+          return;
+        }
+
+        await el.requestFullscreen();
+
+        log({
+          fullscreen: "entered",
+          element: "documentElement",
+          time: new Date().toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour12: false
+          })
+        });
+      } catch (err) {
+        log({
+          fullscreen: "failed",
+          error: err.name,
+          message: err.message
+        });
+      }
+    }
+
+    async function iframeFullscreenOff() {
+      try {
+        if (!document.fullscreenElement) {
+          log({ fullscreenExit: "not in fullscreen" });
+          return;
+        }
+
+        await document.exitFullscreen();
+
+        log({
+          fullscreen: "exited",
+          time: new Date().toLocaleString("id-ID", {
+            timeZone: "Asia/Jakarta",
+            hour12: false
+          })
+        });
+      } catch (err) {
+        log({
+          fullscreenExit: "failed",
           error: err.message
         });
       }
