@@ -117,7 +117,7 @@
 
   <div class="card">
     <h2>Helpdesk Iframe Test</h2>
-    <p>update: Tuesday, February 10, 2026 9:41:43 AM GMT+07:00</p>
+    <p>update: Tuesday, February 10, 2026 10:10:58 AM GMT+07:00</p>
 
     <div class="section-title">Context</div>
     <div class="grid">
@@ -189,13 +189,36 @@
       <span id="clipboardResult" style="font-size:13px;color:#334155"></span>
     </div>
 
-    <div class="section-title">Fullscreen Permision Test (Native API)</div>
+    <!-- TODO: masih blm jalan -->
+    <!-- <div class="section-title">Fullscreen Permision Test (Native API)</div>
     <div class="grid">
       <button onclick="iframeFullscreenOn()" class="purple">
         Iframe Fullscreen ON
       </button>
       <button onclick="iframeFullscreenOff()" class="secondary">
         Iframe Fullscreen OFF
+      </button>
+    </div> -->
+
+    <div class="section-title">Web Share Permission Test</div>
+
+    <div class="row">
+      <label>
+        Share Title
+        <input id="shareTitle" value="Helpdesk Ticket" />
+      </label>
+      <label>
+        Share Text
+        <input id="shareText" value="Check this ticket from helpdesk app" />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        Share URL
+        <input id="shareUrl" value="https://example.com/ticket/123" />
+      </label>
+      <button onclick="webShare()" class="green">
+        Open Native Share
       </button>
     </div>
   </div>
@@ -363,22 +386,85 @@
       }
     }
 
-    async function iframeFullscreenOn() {
+    // TODO
+    // async function iframeFullscreenOn() {
+    //   try {
+    //     const el = document.documentElement;
+
+    //     if (!document.fullscreenEnabled) {
+    //       log({
+    //         fullscreen: "not supported or blocked by permission policy"
+    //       });
+    //       return;
+    //     }
+
+    //     await el.requestFullscreen();
+
+    //     log({
+    //       fullscreen: "entered",
+    //       element: "documentElement",
+    //       time: new Date().toLocaleString("id-ID", {
+    //         timeZone: "Asia/Jakarta",
+    //         hour12: false
+    //       })
+    //     });
+    //   } catch (err) {
+    //     log({
+    //       fullscreen: "failed",
+    //       error: err.name,
+    //       message: err.message
+    //     });
+    //   }
+    // }
+
+    // TODO
+    // async function iframeFullscreenOff() {
+    //   try {
+    //     if (!document.fullscreenElement) {
+    //       log({ fullscreenExit: "not in fullscreen" });
+    //       return;
+    //     }
+
+    //     await document.exitFullscreen();
+
+    //     log({
+    //       fullscreen: "exited",
+    //       time: new Date().toLocaleString("id-ID", {
+    //         timeZone: "Asia/Jakarta",
+    //         hour12: false
+    //       })
+    //     });
+    //   } catch (err) {
+    //     log({
+    //       fullscreenExit: "failed",
+    //       error: err.message
+    //     });
+    //   }
+    // }
+
+    async function webShare() {
+      if (!navigator.share) {
+        log({
+          webShare: "not supported",
+          reason: "navigator.share is undefined"
+        });
+        return;
+      }
+
+      const title = document.getElementById("shareTitle").value;
+      const text = document.getElementById("shareText").value;
+      const url = document.getElementById("shareUrl").value;
+
       try {
-        const el = document.documentElement;
-
-        if (!document.fullscreenEnabled) {
-          log({
-            fullscreen: "not supported or blocked by permission policy"
-          });
-          return;
-        }
-
-        await el.requestFullscreen();
+        await navigator.share({
+          title,
+          text,
+          url
+        });
 
         log({
-          fullscreen: "entered",
-          element: "documentElement",
+          webShare: "success",
+          payload: { title, text, url },
           time: new Date().toLocaleString("id-ID", {
             timeZone: "Asia/Jakarta",
             hour12: false
@@ -386,33 +472,9 @@
         });
       } catch (err) {
         log({
-          fullscreen: "failed",
+          webShare: "cancelled_or_failed",
           error: err.name,
           message: err.message
-        });
-      }
-    }
-
-    async function iframeFullscreenOff() {
-      try {
-        if (!document.fullscreenElement) {
-          log({ fullscreenExit: "not in fullscreen" });
-          return;
-        }
-
-        await document.exitFullscreen();
-
-        log({
-          fullscreen: "exited",
-          time: new Date().toLocaleString("id-ID", {
-            timeZone: "Asia/Jakarta",
-            hour12: false
-          })
-        });
-      } catch (err) {
-        log({
-          fullscreenExit: "failed",
-          error: err.message
         });
       }
     }
